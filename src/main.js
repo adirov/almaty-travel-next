@@ -8,7 +8,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const mountain = '<svg viewBox="0 0 50 34" fill="none" aria-hidden="true"><path d="M2 31 19 3l11 18 6-10 12 20H2Z" stroke="currentColor" stroke-width="2.4"/><path d="m13 13 6 4 5-5" stroke="currentColor" stroke-width="2"/></svg>';
 let route = parseRoute(location.hash);
-let previousRoute, timeline, observer, terrainRoot;
+let previousRoute, timeline, observer, heroMedia;
 let disposeScene = () => {};
 let sceneGeneration = 0;
 let inquiryDraft = {};
@@ -52,8 +52,8 @@ function home(keepScene) {
   <section class="section tours-section"><div class="section-heading reveal"><h2>${L('Экскурсии из Алматы','Tours from Almaty')}</h2><a class="text-link" href="${href('/catalog')}">${L('Все экскурсии','All tours')}</a></div><div class="tour-grid">${picks.map(card).join('')}</div></section>
   <section class="manifesto"><img src="${imageFor('/ru/tours/379/')}" alt="${L('Поющий бархан в Алтын-Емеле','The Singing Dune in Altyn Emel')}" loading="lazy"><div class="manifesto-shade"></div><div class="manifesto-content reveal"><h2>${L('Поездка<br>по вашему маршруту','A journey<br>planned around you')}</h2><p>${L('Хотите совместить несколько мест или поехать своей компанией?<br>Обсудим маршрут, транспорт и проживание.','Want to combine destinations or travel as a private group?<br>Talk to us about your route, transport and accommodation.')}</p><a class="button" href="${href('/order')}">${L('Обсудить маршрут','Plan your route')}</a></div></section>
   <section class="section services-section"><div class="section-heading reveal"><h2>${L('Услуги для путешественников','Travel services')}</h2><p>${L('От встречи в аэропорту до прогулки верхом.','From an airport transfer to a horseback ride.')}</p></div><div class="service-list">${serviceRows(data.nav.slice(2))}</div></section><section class="section about-strip reveal"><h2>Kazakhstan<br>Travel Agency</h2><p>${L('Организуем экскурсии по Алматы и окрестностям, индивидуальные поездки и активный отдых. Свяжитесь с нами, чтобы уточнить программу и условия.','We arrange tours in Almaty and the surrounding region, private trips and outdoor activities. Contact us to discuss itineraries and arrangements.')}</p><a class="text-link" href="${href('/ru/pages/13.html')}">${L('О компании','About us')}</a></section>`;
-  if(!keepScene||!terrainRoot){terrainRoot=document.createElement('div');terrainRoot.className='terrain-wrap';terrainRoot.setAttribute('aria-hidden','true');terrainRoot.innerHTML='<div id="terrain"></div>';const generation=++sceneGeneration;import('./terrain.js').then(({mountTerrain})=>{if(generation===sceneGeneration&&terrainRoot?.isConnected)disposeScene=mountTerrain(terrainRoot.firstElementChild,reduced.matches);});}
-  document.querySelector('.hero').prepend(terrainRoot);
+  if(!keepScene||!heroMedia){heroMedia=document.createElement('div');heroMedia.className='hero-media';heroMedia.setAttribute('aria-hidden','true');heroMedia.innerHTML='<div id="hero-scene"></div>';const generation=++sceneGeneration;import('./hero-scene.js').then(({mountHeroPhoto})=>{if(generation===sceneGeneration&&heroMedia?.isConnected)disposeScene=mountHeroPhoto(heroMedia.firstElementChild,reduced.matches);});}
+  document.querySelector('.hero').prepend(heroMedia);
 }
 function catalog() {
   let category=route.path.includes('mountainstours')?'winter':route.params.get('type')||'all';
@@ -85,8 +85,8 @@ function order(){
 function reveal(){observer?.disconnect();if(reduced.matches){document.querySelectorAll('.reveal').forEach(e=>e.classList.add('shown'));return;}observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('shown');observer.unobserve(e.target);}}),{threshold:.06});document.querySelectorAll('.reveal:not(.shown)').forEach(e=>observer.observe(e));}
 function render(){
   if(location.hash==='#main'){main.focus();return;}
-  saveDraft();route=parseRoute(location.hash);const languageChange=previousRoute&&previousRoute.path===route.path&&previousRoute.lang!==route.lang;const savedScroll=scrollY;const keepScene=route.path==='/'&&previousRoute?.path==='/'&&!!terrainRoot;
-  if(!keepScene){sceneGeneration++;disposeScene();disposeScene=()=>{};terrainRoot=null;}
+  saveDraft();route=parseRoute(location.hash);const languageChange=previousRoute&&previousRoute.path===route.path&&previousRoute.lang!==route.lang;const savedScroll=scrollY;const keepScene=route.path==='/'&&previousRoute?.path==='/'&&!!heroMedia;
+  if(!keepScene){sceneGeneration++;disposeScene();disposeScene=()=>{};heroMedia=null;}
   timeline?.revert();observer?.disconnect();closeMenu();chrome();document.title=L('Almaty Travel — экскурсии по Алматы и Казахстану','Almaty Travel — tours in Almaty and Kazakhstan');
   if(route.path==='/')home(keepScene);else if(['/catalog','/ru/tours/','/ru/mountainstours/'].includes(route.path))catalog();else if(route.path==='/services')services();else if(['/order','/ru/order/'].includes(route.path))order();else if(route.path==='/ru/photo/')gallery();else if(route.path==='/ru/map/')siteMap();else detail();
   const position=languageChange?savedScroll:0;window.scrollTo({top:position,behavior:'instant'});requestAnimationFrame(()=>window.scrollTo({top:position,behavior:'instant'}));reveal();
