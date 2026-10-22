@@ -1,6 +1,6 @@
 # Almaty Travel — redesign
 
-Public demonstration of a redesigned Kazakhstan Travel Agency website. Black, white and orange; Three.js mountain landscape; responsive layouts and GSAP entrance animation.
+Kazakhstan Travel Agency website redesign. Black, white and orange; a full-screen Three.js mountain landscape; responsive layouts and restrained entrance animations.
 
 ## Development
 
@@ -16,7 +16,9 @@ Deployed to GitHub Pages by `.github/workflows/pages.yml`. Vite base: `/almaty-t
 
 ## Content
 
-`src/content.json` contains 105 pages extracted from the existing site mirror and 14 tour summaries. Images are retained in `public/legacy`. Routes use URL fragments so shared links work directly on GitHub Pages.
+`src/content.json` contains 118 content entries, including the original site mirror, 14 tour summaries and added English versions for missing albums and Oi Qaragai. Images are retained in `public/legacy`. Routes use URL fragments so shared links work directly on GitHub Pages.
+
+Russian and English share the same page templates. Switching language retains the current route, catalogue filters and enquiry draft. The home page keeps its existing WebGL canvas while its text changes. `src/routing.js` defines canonical bilingual routes. Run `npm test` to check route round trips, translation coverage and removal of decorative/editor metadata; these checks also run before deployment.
 
 The new enquiry form prepares a WhatsApp message; visitors must send it themselves. It does not pretend to submit to a server. Historical descriptions and prices are preserved; current conditions should be confirmed with the agency. External video availability depends on its owner. The stylised 3D terrain is decorative, not a geographic map.
 
